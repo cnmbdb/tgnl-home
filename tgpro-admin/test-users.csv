@@ -1,0 +1,4 @@
+tg_user_id,username,first_name,last_name,phone_number,balance
+111222333,csvuser1,CSV,User1,+1112223333,3000000
+444555666,csvuser2,CSV,User2,+4445556666,4000000
+777888999,csvuser3,CSV,User3,+7778889999,1500000

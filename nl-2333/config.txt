@@ -1,0 +1,15 @@
+TOKEN=7387974353:AAFTRZbnZuySmRUB8dhVpJ-IGQmmE5Vzpr0
+CUSTOMER_SERVICE_ID=https://t.me/HFTGID
+bot_id=https://t.me/HFTGNLTR
+group_link=https://t.me/HFZChat
+control_address=233333
+privateKey=23333344444
+username=light6841
+password=light6841ncdja
+ad_time=940
+huilv_zhekou=0.90
+admin_id=825512163
+hour_price=3.0
+day_price=9.0
+three_day_price=7.0
+yucun_price=10.0

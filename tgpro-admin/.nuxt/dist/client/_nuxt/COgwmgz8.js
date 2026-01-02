@@ -1,0 +1,1 @@
+const e=globalThis.setInterval;export{e as t};

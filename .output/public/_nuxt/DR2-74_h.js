@@ -1,0 +1,1 @@
+import{z as t,v as o}from"./DHd3czt2.js";import{u as r}from"./4Zh6zqc8.js";const d=t((e,s)=>{const a=r("isLoggedIn",{default:()=>!1});if(!a.value&&e.path!=="/")return o("/");if(a.value&&e.path==="/")return o("/dashboard")});export{d as default};

@@ -1,0 +1,837 @@
+<template>
+  <div class="max-w-6xl mx-auto space-y-6">
+    <!-- 页面标题 -->
+    <div class="text-center space-y-4">
+      <div class="flex justify-center">
+        <div class="w-16 h-16 bg-[#1a1a1b] border border-[#2a2a2b] rounded-2xl flex items-center justify-center">
+          <UIcon name="i-heroicons-key" class="w-8 h-8 text-[#00dc82]" />
+        </div>
+      </div>
+      <h1 class="text-3xl font-bold text-white">更新授权</h1>
+      <p class="text-[#9ca3af] max-w-2xl mx-auto">
+        管理系统授权许可、更新授权状态和许可证信息
+      </p>
+    </div>
+
+    <!-- 当前授权状态 -->
+    <div class="bg-[#1a1a1b] border border-[#2a2a2b] rounded-xl p-6">
+      <h2 class="text-xl font-semibold text-white mb-4 flex items-center">
+        <UIcon name="i-heroicons-shield-check" class="w-5 h-5 mr-3 text-[#00dc82]" />
+        当前授权状态
+      </h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="text-center space-y-2">
+          <div class="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center mx-auto">
+            <UIcon name="i-heroicons-check-circle" class="w-6 h-6 text-green-400" />
+          </div>
+          <div class="text-lg font-semibold text-green-400">{{ license.status }}</div>
+          <div class="text-sm text-[#00dc82]">授权状态</div>
+          <div class="text-xs text-[#9ca3af]">有效期至: {{ license.expiryDate }}</div>
+        </div>
+        
+        <div class="text-center space-y-2">
+          <div class="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center mx-auto">
+            <UIcon name="i-heroicons-users" class="w-6 h-6 text-blue-400" />
+          </div>
+          <div class="text-lg font-semibold text-white">{{ license.maxUsers }}</div>
+          <div class="text-sm text-blue-400">最大用户数</div>
+          <div class="text-xs text-[#9ca3af]">当前: {{ license.currentUsers }} 用户</div>
+        </div>
+        
+        <div class="text-center space-y-2">
+          <div class="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center mx-auto">
+            <UIcon name="i-heroicons-server" class="w-6 h-6 text-purple-400" />
+          </div>
+          <div class="text-lg font-semibold text-white">{{ license.edition }}</div>
+          <div class="text-sm text-purple-400">授权版本</div>
+          <div class="text-xs text-[#9ca3af]">功能: {{ license.features }}</div>
+        </div>
+        
+        <div class="text-center space-y-2">
+          <div class="w-12 h-12 bg-orange-500/10 rounded-xl flex items-center justify-center mx-auto">
+            <UIcon name="i-heroicons-calendar-days" class="w-6 h-6 text-orange-400" />
+          </div>
+          <div class="text-lg font-semibold text-white">{{ license.remainingDays }}</div>
+          <div class="text-sm text-orange-400">剩余天数</div>
+          <div class="text-xs text-[#9ca3af]">自动续期: {{ license.autoRenewal ? '已启用' : '已禁用' }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 授权信息 -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- 许可证详情 -->
+      <div class="bg-[#1a1a1b] border border-[#2a2a2b] rounded-xl p-6">
+        <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
+          <UIcon name="i-heroicons-document-text" class="w-5 h-5 mr-3 text-[#00dc82]" />
+          许可证详情
+        </h3>
+        
+        <div class="space-y-4">
+          <div class="flex items-center justify-between p-3 bg-[#0c0c0d] border border-[#2a2a2b] rounded-lg">
+            <div>
+              <div class="text-white font-medium text-sm mb-1">许可证ID</div>
+              <div class="text-sm text-[#9ca3af] font-mono">{{ licenseDetails.id }}</div>
+            </div>
+            <UButton variant="ghost" size="sm" @click="copyLicenseId" class="text-[#00dc82]">
+              <UIcon name="i-heroicons-clipboard" class="w-4 h-4" />
+            </UButton>
+          </div>
+          
+          <div class="flex items-center justify-between p-3 bg-[#0c0c0d] border border-[#2a2a2b] rounded-lg">
+            <div class="flex-1">
+              <div class="text-white font-medium text-sm mb-1">授权类型</div>
+              <div class="text-sm text-[#9ca3af]">{{ licenseDetails.type }}</div>
+            </div>
+            <UBadge :color="licenseDetails.type === '永久授权' ? 'green' : 'blue'" variant="subtle">
+              {{ licenseDetails.type }}
+            </UBadge>
+          </div>
+          
+          <div class="flex items-center justify-between p-3 bg-[#0c0c0d] border border-[#2a2a2b] rounded-lg">
+            <div>
+              <div class="text-white font-medium text-sm mb-1">激活时间</div>
+              <div class="text-sm text-[#9ca3af]">{{ licenseDetails.activatedAt }}</div>
+            </div>
+          </div>
+          
+          <div class="flex items-center justify-between p-3 bg-[#0c0c0d] border border-[#2a2a2b] rounded-lg">
+            <div class="flex-1">
+              <div class="text-white font-medium text-sm mb-1">最后验证</div>
+              <div class="text-sm text-[#9ca3af]">{{ licenseDetails.lastVerified }}</div>
+            </div>
+            <UButton variant="ghost" size="sm" @click="verifyLicense" :loading="verifying" class="text-[#00dc82]">
+              <UIcon name="i-heroicons-arrow-path" class="w-4 h-4" />
+            </UButton>
+          </div>
+        </div>
+      </div>
+
+      <!-- 功能权限 -->
+      <div class="bg-[#1a1a1b] border border-[#2a2a2b] rounded-xl p-6">
+        <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
+          <UIcon name="i-heroicons-lock-closed" class="w-5 h-5 mr-3 text-[#00dc82]" />
+          功能权限
+        </h3>
+        
+        <div class="space-y-3">
+          <div v-for="feature in features" :key="feature.name" 
+            class="flex items-center justify-between p-3 bg-[#0c0c0d] border border-[#2a2a2b] rounded-lg">
+            <div class="flex items-center space-x-3 flex-1">
+              <UIcon :name="feature.icon" class="w-5 h-5 text-[#00dc82]" />
+              <div class="flex-1">
+                <div class="text-white font-medium text-sm">{{ feature.name }}</div>
+                <div class="text-xs text-[#9ca3af]">{{ feature.description }}</div>
+              </div>
+            </div>
+            <UBadge 
+              :color="feature.enabled ? 'green' : 'gray'" 
+              variant="subtle"
+              size="xs"
+            >
+              {{ feature.enabled ? '已启用' : '未授权' }}
+            </UBadge>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 更新授权 -->
+    <div class="bg-[#1a1a1b] border border-[#2a2a2b] rounded-xl p-6">
+      <h3 class="text-lg font-semibold text-white mb-6 flex items-center">
+        <UIcon name="i-heroicons-arrow-up-circle" class="w-5 h-5 mr-3 text-[#00dc82]" />
+        更新授权
+      </h3>
+
+      <!-- 选项卡 -->
+      <UTabs :items="activationTabs" class="mb-6">
+        <!-- WordPress订单激活 -->
+        <template #wordpress>
+          <div class="space-y-4 pt-4">
+            <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-4">
+              <div class="flex items-start space-x-3">
+                <UIcon name="i-heroicons-information-circle" class="w-5 h-5 text-blue-400 mt-0.5" />
+                <div>
+                  <div class="text-white font-medium mb-1">WordPress订单激活</div>
+                  <div class="text-sm text-[#9ca3af]">
+                    使用您在 <a href="https://hfz.pw/shop/2101.html" target="_blank" class="text-blue-400 hover:text-blue-300 underline">HFZ商城</a> 购买授权商品的订单号作为激活码
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-white font-medium mb-2">订单号</label>
+              <UInput 
+                v-model="orderNumber" 
+                placeholder="请输入WordPress订单号，例如：12345"
+                size="lg"
+                class="w-full"
+                :disabled="validating || activating"
+              />
+              <div class="text-xs text-[#9ca3af] mt-2">
+                您可以在订单确认邮件中找到订单号，或登录商城查看订单详情
+              </div>
+            </div>
+
+            <!-- 验证结果 -->
+            <div v-if="orderValidation" class="p-4 rounded-lg border" :class="{
+              'bg-green-500/10 border-green-500/30': orderValidation.valid,
+              'bg-red-500/10 border-red-500/30': !orderValidation.valid
+            }">
+              <div class="flex items-start space-x-3">
+                <UIcon 
+                  :name="orderValidation.valid ? 'i-heroicons-check-circle' : 'i-heroicons-x-circle'" 
+                  class="w-5 h-5 mt-0.5"
+                  :class="orderValidation.valid ? 'text-green-400' : 'text-red-400'"
+                />
+                <div class="flex-1">
+                  <div class="font-medium mb-1" :class="orderValidation.valid ? 'text-green-400' : 'text-red-400'">
+                    {{ orderValidation.message }}
+                  </div>
+                  <div v-if="orderValidation.valid && orderValidation.license" class="text-sm text-[#9ca3af] space-y-1 mt-2">
+                    <div>客户：{{ orderValidation.license.customerName }} ({{ orderValidation.license.customerEmail }})</div>
+                    <div>版本：{{ orderValidation.license.edition }}</div>
+                    <div>有效期：{{ orderValidation.license.duration }} 天（至 {{ orderValidation.license.expiryDate }}）</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="flex space-x-4">
+              <UButton 
+                @click="validateOrder" 
+                :loading="validating" 
+                :disabled="!orderNumber || activating"
+                variant="outline"
+              >
+                <UIcon name="i-heroicons-shield-check" class="w-4 h-4 mr-2" />
+                验证订单
+              </UButton>
+              <UButton 
+                @click="activateWithOrder" 
+                :loading="activating" 
+                :disabled="!orderNumber || !orderValidation?.valid || validating"
+                class="bg-[#00dc82] hover:bg-[#00dc82]/80"
+              >
+                <UIcon name="i-heroicons-key" class="w-4 h-4 mr-2" />
+                激活授权
+              </UButton>
+            </div>
+          </div>
+        </template>
+
+        <!-- 授权密钥激活 -->
+        <template #key>
+          <div class="space-y-4 pt-4">
+            <div>
+              <label class="block text-white font-medium mb-2">授权密钥</label>
+              <UTextarea 
+                v-model="newLicenseKey" 
+                placeholder="请输入新的授权密钥..."
+                :rows="4"
+                class="w-full"
+              />
+            </div>
+            
+            <div class="flex space-x-4">
+              <UButton 
+                @click="updateLicense" 
+                :loading="updating" 
+                :disabled="!newLicenseKey"
+                class="bg-[#00dc82] hover:bg-[#00dc82]/80"
+              >
+                <UIcon name="i-heroicons-key" class="w-4 h-4 mr-2" />
+                更新授权
+              </UButton>
+              <UButton 
+                variant="outline" 
+                @click="validateKey" 
+                :disabled="!newLicenseKey"
+              >
+                <UIcon name="i-heroicons-shield-check" class="w-4 h-4 mr-2" />
+                验证密钥
+              </UButton>
+            </div>
+          </div>
+        </template>
+
+        <!-- 文件上传 -->
+        <template #file>
+          <div class="space-y-4 pt-4">
+            <div>
+              <div class="text-white font-medium mb-3">授权文件上传</div>
+              <div class="border-2 border-dashed border-[#2a2a2b] rounded-lg p-8 text-center hover:border-[#00dc82]/50 transition-colors cursor-pointer"
+                @click="selectFile"
+                @dragover.prevent
+                @drop.prevent="handleFileDrop">
+                <UIcon name="i-heroicons-cloud-arrow-up" class="w-10 h-10 text-[#9ca3af] mx-auto mb-3" />
+                <div class="text-[#9ca3af] mb-3">拖拽授权文件到此处或</div>
+                <UButton variant="outline" size="sm">
+                  <UIcon name="i-heroicons-folder-open" class="w-4 h-4 mr-2" />
+                  选择文件
+                </UButton>
+                <input 
+                  ref="fileInput" 
+                  type="file" 
+                  accept=".lic,.key,.license" 
+                  class="hidden" 
+                  @change="handleFileSelect"
+                />
+              </div>
+            </div>
+          </div>
+        </template>
+      </UTabs>
+    </div>
+
+    <!-- 授权历史 -->
+    <div class="bg-[#1a1a1b] border border-[#2a2a2b] rounded-xl p-6">
+      <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
+        <UIcon name="i-heroicons-clock" class="w-5 h-5 mr-3 text-[#00dc82]" />
+        授权历史
+      </h3>
+      
+      <div class="space-y-3">
+        <div v-for="history in licenseHistory" :key="history.id" 
+          class="flex items-center justify-between p-4 bg-[#0c0c0d] border border-[#2a2a2b] rounded-lg hover:border-[#00dc82]/30 transition-colors">
+          <div class="flex items-center space-x-4">
+            <div class="w-10 h-10 bg-[#1a1a1b] border border-[#2a2a2b] rounded-lg flex items-center justify-center">
+              <UIcon :name="history.icon" class="w-5 h-5 text-[#00dc82]" />
+            </div>
+            <div>
+              <div class="text-white font-medium">{{ history.action }}</div>
+              <div class="text-sm text-[#9ca3af]">{{ history.description }}</div>
+            </div>
+          </div>
+          <div class="text-right">
+            <div class="text-sm text-white">{{ history.date }}</div>
+            <div class="text-xs text-[#9ca3af]">{{ history.time }}</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mt-6 flex justify-center">
+        <UButton variant="outline" @click="loadMoreHistory" :loading="loadingMore">
+          <UIcon name="i-heroicons-arrow-down" class="w-4 h-4 mr-2" />
+          加载更多
+        </UButton>
+      </div>
+    </div>
+
+    <!-- 操作按钮 -->
+    <div class="flex justify-center space-x-4 pb-8">
+      <UButton @click="refreshLicense" :loading="refreshing" size="lg" class="bg-[#00dc82] hover:bg-[#00dc82]/80">
+        <UIcon name="i-heroicons-arrow-path" class="w-5 h-5 mr-2" />
+        刷新授权
+      </UButton>
+      <UButton variant="outline" @click="exportLicense" size="lg">
+        <UIcon name="i-heroicons-arrow-down-tray" class="w-5 h-5 mr-2" />
+        导出授权信息
+      </UButton>
+      <UButton variant="outline" @click="contactSupport" size="lg">
+        <UIcon name="i-heroicons-chat-bubble-left-right" class="w-5 h-5 mr-2" />
+        联系支持
+      </UButton>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue'
+
+// 页面元数据
+definePageMeta({
+  title: '更新授权',
+  description: '管理系统授权许可、更新授权状态和许可证信息',
+  middleware: 'auth'
+})
+
+// Toast 通知
+const toast = useToast()
+
+// 响应式数据
+const license = ref({
+  status: '已激活',
+  expiryDate: '2024-12-31',
+  maxUsers: 100,
+  currentUsers: 45,
+  edition: '企业版',
+  features: '全功能',
+  remainingDays: 156,
+  autoRenewal: true
+})
+
+const licenseDetails = ref({
+  id: 'TGP-ENT-2024-XXXX-XXXX-XXXX',
+  issuer: 'TG Pro Technologies',
+  type: '年度授权',
+  activatedAt: '2024-01-01 10:30:00',
+  lastVerified: '2小时前'
+})
+
+const features = ref([
+  {
+    name: '机器人管理',
+    description: '创建和管理多个Telegram机器人',
+    icon: 'i-heroicons-cpu-chip',
+    enabled: true
+  },
+  {
+    name: '用户管理',
+    description: '管理用户权限和访问控制',
+    icon: 'i-heroicons-users',
+    enabled: true
+  },
+  {
+    name: '数据分析',
+    description: '详细的使用统计和分析报告',
+    icon: 'i-heroicons-chart-bar',
+    enabled: true
+  },
+  {
+    name: 'API 接口',
+    description: '完整的REST API访问权限',
+    icon: 'i-heroicons-code-bracket',
+    enabled: true
+  },
+  {
+    name: '高级功能',
+    description: '自定义插件和扩展功能',
+    icon: 'i-heroicons-puzzle-piece',
+    enabled: true
+  },
+  {
+    name: '技术支持',
+    description: '7x24小时技术支持服务',
+    icon: 'i-heroicons-chat-bubble-left-right',
+    enabled: true
+  }
+])
+
+const licenseHistory = ref([
+  {
+    id: 1,
+    action: '授权激活',
+    description: '成功激活企业版授权',
+    date: '2024-01-01',
+    time: '10:30:00',
+    icon: 'i-heroicons-check-circle'
+  },
+  {
+    id: 2,
+    action: '授权验证',
+    description: '定期授权状态验证',
+    date: '2024-01-15',
+    time: '14:20:00',
+    icon: 'i-heroicons-shield-check'
+  },
+  {
+    id: 3,
+    action: '功能更新',
+    description: '新增高级分析功能',
+    date: '2024-02-01',
+    time: '09:15:00',
+    icon: 'i-heroicons-arrow-up-circle'
+  },
+  {
+    id: 4,
+    action: '授权续期',
+    description: '自动续期至2024年底',
+    date: '2024-03-01',
+    time: '00:00:00',
+    icon: 'i-heroicons-calendar-days'
+  }
+])
+
+const newLicenseKey = ref('')
+const fileInput = ref(null)
+const orderNumber = ref('')
+const orderValidation = ref<any>(null)
+
+// 激活选项卡
+const activationTabs = [
+  {
+    key: 'wordpress',
+    label: 'WordPress订单',
+    icon: 'i-heroicons-shopping-cart'
+  },
+  {
+    key: 'key',
+    label: '授权密钥',
+    icon: 'i-heroicons-key'
+  },
+  {
+    key: 'file',
+    label: '文件上传',
+    icon: 'i-heroicons-document-arrow-up'
+  }
+]
+
+// 加载状态
+const verifying = ref(false)
+const updating = ref(false)
+const refreshing = ref(false)
+const loadingMore = ref(false)
+const validating = ref(false)
+const activating = ref(false)
+
+// 方法
+const copyLicenseId = () => {
+  navigator.clipboard.writeText(licenseDetails.value.id)
+  toast.add({
+    title: '复制成功',
+    description: '许可证ID已复制到剪贴板',
+    icon: 'i-heroicons-check-circle',
+    color: 'green'
+  })
+}
+
+const verifyLicense = async () => {
+  verifying.value = true
+  try {
+    const { data } = await useFetch('/api/license/verify', {
+      method: 'POST'
+    })
+    
+    if (data.value?.success) {
+      licenseDetails.value.lastVerified = '刚刚'
+      toast.add({
+        title: '验证成功',
+        description: '授权状态正常',
+        icon: 'i-heroicons-check-circle',
+        color: 'green'
+      })
+    }
+  } catch (error) {
+    toast.add({
+      title: '验证失败',
+      description: error.message || '无法验证授权状态',
+      icon: 'i-heroicons-x-circle',
+      color: 'red'
+    })
+  } finally {
+    verifying.value = false
+  }
+}
+
+const updateLicense = async () => {
+  if (!newLicenseKey.value) return
+  
+  updating.value = true
+  try {
+    const { data } = await useFetch('/api/license/update', {
+      method: 'POST',
+      body: {
+        licenseKey: newLicenseKey.value
+      }
+    })
+    
+    if (data.value?.success) {
+      toast.add({
+        title: '更新成功',
+        description: '授权已成功更新',
+        icon: 'i-heroicons-check-circle',
+        color: 'green'
+      })
+      newLicenseKey.value = ''
+      await loadLicenseInfo()
+    }
+  } catch (error) {
+    toast.add({
+      title: '更新失败',
+      description: error.message || '无法更新授权',
+      icon: 'i-heroicons-x-circle',
+      color: 'red'
+    })
+  } finally {
+    updating.value = false
+  }
+}
+
+const validateKey = async () => {
+  if (!newLicenseKey.value) return
+  
+  try {
+    const { data } = await useFetch('/api/license/validate', {
+      method: 'POST',
+      body: {
+        licenseKey: newLicenseKey.value
+      }
+    })
+    
+    if (data.value?.valid) {
+      toast.add({
+        title: '密钥有效',
+        description: '该授权密钥有效且可以使用',
+        icon: 'i-heroicons-check-circle',
+        color: 'green'
+      })
+    } else {
+      toast.add({
+        title: '密钥无效',
+        description: '该授权密钥无效或已过期',
+        icon: 'i-heroicons-x-circle',
+        color: 'red'
+      })
+    }
+  } catch (error) {
+    toast.add({
+      title: '验证失败',
+      description: error.message || '无法验证密钥',
+      icon: 'i-heroicons-x-circle',
+      color: 'red'
+    })
+  }
+}
+
+const selectFile = () => {
+  fileInput.value?.click()
+}
+
+const handleFileSelect = async (event) => {
+  const file = event.target.files[0]
+  if (file) {
+    await uploadLicenseFile(file)
+  }
+}
+
+const handleFileDrop = async (event) => {
+  const file = event.dataTransfer.files[0]
+  if (file) {
+    await uploadLicenseFile(file)
+  }
+}
+
+const uploadLicenseFile = async (file) => {
+  try {
+    const formData = new FormData()
+    formData.append('file', file)
+    
+    const { data } = await useFetch('/api/license/upload', {
+      method: 'POST',
+      body: formData
+    })
+    
+    if (data.value?.success) {
+      toast.add({
+        title: '上传成功',
+        description: '授权文件已成功上传并应用',
+        icon: 'i-heroicons-check-circle',
+        color: 'green'
+      })
+      await loadLicenseInfo()
+    }
+  } catch (error) {
+    toast.add({
+      title: '上传失败',
+      description: error.message || '无法上传授权文件',
+      icon: 'i-heroicons-x-circle',
+      color: 'red'
+    })
+  }
+}
+
+const loadMoreHistory = async () => {
+  loadingMore.value = true
+  try {
+    // 模拟加载更多历史记录
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    toast.add({
+      title: '加载完成',
+      description: '已加载所有历史记录',
+      icon: 'i-heroicons-check-circle',
+      color: 'green'
+    })
+  } finally {
+    loadingMore.value = false
+  }
+}
+
+const refreshLicense = async () => {
+  refreshing.value = true
+  try {
+    await loadLicenseInfo()
+    toast.add({
+      title: '刷新成功',
+      description: '授权信息已更新',
+      icon: 'i-heroicons-check-circle',
+      color: 'green'
+    })
+  } catch (error) {
+    toast.add({
+      title: '刷新失败',
+      description: error.message || '无法刷新授权信息',
+      icon: 'i-heroicons-x-circle',
+      color: 'red'
+    })
+  } finally {
+    refreshing.value = false
+  }
+}
+
+const exportLicense = () => {
+  const licenseInfo = {
+    ...license.value,
+    ...licenseDetails.value,
+    features: features.value,
+    exportedAt: new Date().toISOString()
+  }
+  
+  const dataStr = JSON.stringify(licenseInfo, null, 2)
+  const dataBlob = new Blob([dataStr], { type: 'application/json' })
+  const url = URL.createObjectURL(dataBlob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `license-${Date.now()}.json`
+  link.click()
+  URL.revokeObjectURL(url)
+  
+  toast.add({
+    title: '导出成功',
+    description: '授权信息已导出',
+    icon: 'i-heroicons-check-circle',
+    color: 'green'
+  })
+}
+
+const contactSupport = () => {
+  window.open('https://t.me/HFTGID', '_blank')
+  toast.add({
+    title: '打开支持',
+    description: '正在打开客服支持页面',
+    icon: 'i-heroicons-chat-bubble-left-right',
+    color: 'blue'
+  })
+}
+
+const loadLicenseInfo = async () => {
+  try {
+    const { data } = await useFetch('/api/license/info')
+    if (data.value?.success) {
+      license.value = data.value.license
+      licenseDetails.value = data.value.details
+      features.value = data.value.features
+    }
+  } catch (error) {
+    console.error('Failed to load license info:', error)
+  }
+}
+
+// WordPress订单验证
+const validateOrder = async () => {
+  if (!orderNumber.value) return
+  
+  validating.value = true
+  orderValidation.value = null
+  
+  try {
+    const { data } = await useFetch('/api/license/validate-order', {
+      method: 'POST',
+      body: {
+        orderNumber: orderNumber.value
+      }
+    })
+    
+    orderValidation.value = data.value
+    
+    if (data.value?.valid) {
+      toast.add({
+        title: '验证成功',
+        description: '订单有效，可以进行激活',
+        icon: 'i-heroicons-check-circle',
+        color: 'green'
+      })
+    } else {
+      toast.add({
+        title: '验证失败',
+        description: data.value?.message || '订单验证失败',
+        icon: 'i-heroicons-x-circle',
+        color: 'red'
+      })
+    }
+  } catch (error: any) {
+    orderValidation.value = {
+      valid: false,
+      message: error.message || '验证过程出错'
+    }
+    toast.add({
+      title: '验证失败',
+      description: error.message || '无法验证订单',
+      icon: 'i-heroicons-x-circle',
+      color: 'red'
+    })
+  } finally {
+    validating.value = false
+  }
+}
+
+// WordPress订单激活
+const activateWithOrder = async () => {
+  if (!orderNumber.value || !orderValidation.value?.valid) return
+  
+  activating.value = true
+  try {
+    const { data } = await useFetch('/api/license/activate-order', {
+      method: 'POST',
+      body: {
+        orderNumber: orderNumber.value
+      }
+    })
+    
+    if (data.value?.success) {
+      toast.add({
+        title: '激活成功',
+        description: '授权已成功激活',
+        icon: 'i-heroicons-check-circle',
+        color: 'green'
+      })
+      
+      // 清空表单
+      orderNumber.value = ''
+      orderValidation.value = null
+      
+      // 刷新授权信息
+      await loadLicenseInfo()
+      
+      // 添加到历史记录
+      licenseHistory.value.unshift({
+        id: Date.now(),
+        action: '授权激活',
+        description: `使用WordPress订单激活授权`,
+        date: new Date().toISOString().split('T')[0],
+        time: new Date().toLocaleTimeString('zh-CN'),
+        icon: 'i-heroicons-check-circle'
+      })
+    }
+  } catch (error: any) {
+    toast.add({
+      title: '激活失败',
+      description: error.message || '无法激活授权',
+      icon: 'i-heroicons-x-circle',
+      color: 'red'
+    })
+  } finally {
+    activating.value = false
+  }
+}
+
+const loadLicenseInfo = async () => {
+  try {
+    const { data } = await useFetch('/api/license/info')
+    if (data.value?.success) {
+      license.value = data.value.license
+      licenseDetails.value = data.value.details
+      features.value = data.value.features
+    }
+  } catch (error) {
+    console.error('Failed to load license info:', error)
+  }
+}
+
+// 生命周期
+onMounted(() => {
+  loadLicenseInfo()
+})
+</script>

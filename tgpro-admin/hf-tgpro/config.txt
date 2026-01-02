@@ -1,0 +1,8 @@
+TOKEN=8422817554:AAFUCsTFcKIJhcVJAMETklwRMNZ09cbUENM
+control_address=TJgSKE8hTJYmVExS5kdFX9WQqgAQaSZDwR
+CUSTOMER_SERVICE_ID=https://t.me/HFTGID
+Tiaozhuan=https://t.me/HFTGNLTRXbot
+admin_id=825512163
+three_price=15
+six_price=20
+year_price=35

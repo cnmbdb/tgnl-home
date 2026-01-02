@@ -1,0 +1,37 @@
+nohup: ignoring input
+/www/server/pyporject_evn/versions/3.9.7/lib/python3.9/site-packages/tronapi/__init__.py:9: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+2025-11-06 21:44:12,215 - root - INFO - 配置文件监听器已启动，监听: /www/wwwroot/tgnl-admin/nl-2333/config.txt
+2025-11-06 21:44:12,215 - root - INFO - 配置文件热重载功能已启用
+2025-11-06 21:44:12,216 - root - INFO - 检测到重载标记文件，开始重载配置...
+2025-11-06 21:44:12,216 - root - INFO - 开始重新加载配置文件...
+2025-11-06 21:44:12,217 - root - INFO - 配置文件重新加载成功
+2025-11-06 21:44:12,295 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-11-06 21:44:12,297 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-11-06 21:44:12,297 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-11-06 21:44:12,298 - apscheduler.scheduler - INFO - Added job "scheduled_message" to job store "default"
+2025-11-06 21:44:12,298 - apscheduler.scheduler - INFO - Added job "scheduled_message_fanhuan" to job store "default"
+2025-11-06 21:44:12,298 - apscheduler.scheduler - INFO - Added job "query_and_recharge" to job store "default"
+2025-11-06 21:44:12,298 - apscheduler.scheduler - INFO - Scheduler started
+2025-11-06 21:44:12,299 - apscheduler.scheduler - INFO - Scheduler started
+2025-11-06 21:44:13,020 - root - INFO - 通过重载标记文件重载配置成功
+2025-11-06 21:44:42,297 - apscheduler.executors.default - INFO - Running job "query_and_recharge (trigger: interval[0:00:30], next run at: 2025-11-06 21:44:42 CST)" (scheduled at 2025-11-06 21:44:42.297300+08:00)
+2025-11-06 21:44:42,298 - apscheduler.executors.default - INFO - Job "query_and_recharge (trigger: interval[0:00:30], next run at: 2025-11-06 21:45:12 CST)" executed successfully
+2025-11-06 21:45:12,299 - apscheduler.executors.default - INFO - Running job "query_and_recharge (trigger: interval[0:00:30], next run at: 2025-11-06 21:45:42 CST)" (scheduled at 2025-11-06 21:45:12.297300+08:00)
+2025-11-06 21:45:12,299 - apscheduler.executors.default - INFO - Job "query_and_recharge (trigger: interval[0:00:30], next run at: 2025-11-06 21:45:42 CST)" executed successfully
+2025-11-06 21:45:42,298 - apscheduler.executors.default - INFO - Running job "query_and_recharge (trigger: interval[0:00:30], next run at: 2025-11-06 21:46:12 CST)" (scheduled at 2025-11-06 21:45:42.297300+08:00)
+2025-11-06 21:45:42,298 - apscheduler.executors.default - INFO - Job "query_and_recharge (trigger: interval[0:00:30], next run at: 2025-11-06 21:46:12 CST)" executed successfully
+2025-11-06 21:46:12,298 - apscheduler.executors.default - INFO - Running job "query_and_recharge (trigger: interval[0:00:30], next run at: 2025-11-06 21:46:42 CST)" (scheduled at 2025-11-06 21:46:12.297300+08:00)
+2025-11-06 21:46:12,298 - apscheduler.executors.default - INFO - Job "query_and_recharge (trigger: interval[0:00:30], next run at: 2025-11-06 21:46:42 CST)" executed successfully
+2025-11-06 21:46:42,298 - apscheduler.executors.default - INFO - Running job "query_and_recharge (trigger: interval[0:00:30], next run at: 2025-11-06 21:47:12 CST)" (scheduled at 2025-11-06 21:46:42.297300+08:00)
+2025-11-06 21:46:42,298 - apscheduler.executors.default - INFO - Job "query_and_recharge (trigger: interval[0:00:30], next run at: 2025-11-06 21:47:12 CST)" executed successfully
+2025-11-06 21:47:12,298 - apscheduler.executors.default - INFO - Running job "query_and_recharge (trigger: interval[0:00:30], next run at: 2025-11-06 21:47:42 CST)" (scheduled at 2025-11-06 21:47:12.297300+08:00)
+2025-11-06 21:47:12,298 - apscheduler.executors.default - INFO - Job "query_and_recharge (trigger: interval[0:00:30], next run at: 2025-11-06 21:47:42 CST)" executed successfully
+2025-11-06 21:47:42,298 - apscheduler.executors.default - INFO - Running job "query_and_recharge (trigger: interval[0:00:30], next run at: 2025-11-06 21:48:12 CST)" (scheduled at 2025-11-06 21:47:42.297300+08:00)
+2025-11-06 21:47:42,298 - apscheduler.executors.default - INFO - Job "query_and_recharge (trigger: interval[0:00:30], next run at: 2025-11-06 21:48:12 CST)" executed successfully
+2025-11-06 21:48:12,298 - apscheduler.executors.default - INFO - Running job "query_and_recharge (trigger: interval[0:00:30], next run at: 2025-11-06 21:48:42 CST)" (scheduled at 2025-11-06 21:48:12.297300+08:00)
+2025-11-06 21:48:12,298 - apscheduler.executors.default - INFO - Job "query_and_recharge (trigger: interval[0:00:30], next run at: 2025-11-06 21:48:42 CST)" executed successfully
+2025-11-06 21:48:22,668 - root - INFO - 检测到配置文件变化: /www/wwwroot/tgnl-admin/nl-2333/config.txt
+2025-11-06 21:48:22,668 - root - INFO - 开始重新加载配置文件...
+2025-11-06 21:48:22,669 - root - INFO - 配置文件重新加载成功
+2025-11-06 21:48:23,078 - root - INFO - 配置重载成功

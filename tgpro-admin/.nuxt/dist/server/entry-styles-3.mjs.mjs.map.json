@@ -1,0 +1,1 @@
+{"file":"entry-styles-3.mjs.mjs","mappings":"","names":[],"sources":["../../../node_modules/@nuxt/ui/dist/runtime/ui.css?inline&used"],"sourcesContent":[".dark{color-scheme:dark}a:focus-visible{@apply outline-primary}::-moz-selection{@apply bg-primary/40}::selection{@apply bg-primary/40}"],"version":3}

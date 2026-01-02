@@ -1,0 +1,485 @@
+<template>
+  <div class="space-y-6">
+    <!-- 页面标题 -->
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-2xl font-bold text-white flex items-center gap-3">
+          <div class="w-8 h-8 bg-[#1a1a1b] border border-[#2a2a2b] rounded-lg flex items-center justify-center">
+            <UIcon name="i-heroicons-bolt" class="w-5 h-5 text-[#00dc82]" />
+          </div>
+          能量出租管理系统
+        </h1>
+        <p class="mt-1 text-sm text-[#9ca3af]">监控能量出租机器人状态和交易数据</p>
+      </div>
+      <div class="flex gap-2">
+        <UButton variant="outline" size="sm">
+          <UIcon name="i-heroicons-arrow-path" class="w-4 h-4 mr-2" />
+          刷新数据
+        </UButton>
+        <UButton color="primary" size="sm" class="bg-[#00dc82] hover:bg-[#00dc82]/80">
+          <UIcon name="i-heroicons-cog-6-tooth" class="w-4 h-4 mr-2" />
+          系统设置
+        </UButton>
+      </div>
+    </div>
+
+    <!-- 系统状态概览 -->
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="bg-[#1a1a1b] border border-[#2a2a2b] rounded-lg p-4">
+        <div class="flex items-center">
+          <div class="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center">
+            <UIcon name="i-heroicons-bolt" class="w-5 h-5 text-green-400" />
+          </div>
+          <div class="ml-3">
+            <p class="text-sm text-[#9ca3af]">机器人状态</p>
+            <p class="text-xl font-semibold text-green-400">{{ systemStatus.status }}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-[#1a1a1b] border border-[#2a2a2b] rounded-lg p-4">
+        <div class="flex items-center">
+          <div class="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center">
+            <UIcon name="i-heroicons-users" class="w-5 h-5 text-blue-400" />
+          </div>
+          <div class="ml-3">
+            <p class="text-sm text-[#9ca3af]">活跃用户</p>
+            <p class="text-xl font-semibold text-white">{{ systemStatus.activeUsers }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-[#1a1a1b] border border-[#2a2a2b] rounded-lg p-4">
+        <div class="flex items-center">
+          <div class="w-10 h-10 bg-purple-500/10 rounded-lg flex items-center justify-center">
+            <UIcon name="i-heroicons-currency-dollar" class="w-5 h-5 text-purple-400" />
+          </div>
+          <div class="ml-3">
+            <p class="text-sm text-[#9ca3af]">今日交易</p>
+            <p class="text-xl font-semibold text-white">{{ systemStatus.todayTransactions }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-[#1a1a1b] border border-[#2a2a2b] rounded-lg p-4">
+        <div class="flex items-center">
+          <div class="w-10 h-10 bg-yellow-500/10 rounded-lg flex items-center justify-center">
+            <UIcon name="i-heroicons-bolt" class="w-5 h-5 text-yellow-400" />
+          </div>
+          <div class="ml-3">
+            <p class="text-sm text-[#9ca3af]">总能量出租</p>
+            <p class="text-xl font-semibold text-white">{{ formatEnergy(systemStatus.totalEnergyRented) }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 服务状态监控 -->
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <!-- Telegram 机器人服务 -->
+      <div class="bg-[#1a1a1b] border border-[#2a2a2b] rounded-lg">
+        <div class="px-4 py-3 border-b border-[#2a2a2b] flex items-center justify-between">
+          <h3 class="text-lg font-medium text-white flex items-center gap-2">
+            <UIcon name="i-simple-icons-telegram" class="w-5 h-5 text-blue-400" />
+            能量出租机器人
+          </h3>
+          <UBadge :color="telegramService.status === 'online' ? 'green' : 'red'" variant="subtle">
+            {{ telegramService.status === 'online' ? '在线' : '离线' }}
+          </UBadge>
+        </div>
+        
+        <div class="p-4 space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div class="bg-[#0c0c0d] border border-[#2a2a2b] rounded-md p-3 text-center">
+              <p class="text-2xl font-bold text-white">{{ telegramService.activeUsers }}</p>
+              <p class="text-xs text-[#9ca3af]">活跃用户</p>
+            </div>
+            <div class="bg-[#0c0c0d] border border-[#2a2a2b] rounded-md p-3 text-center">
+              <p class="text-2xl font-bold text-white">{{ telegramService.energyTransactions }}</p>
+              <p class="text-xs text-[#9ca3af]">能量交易</p>
+            </div>
+          </div>
+          
+          <!-- 机器人进程状态 -->
+          <div class="bg-[#0c0c0d] border border-[#2a2a2b] rounded-md p-4">
+            <div class="flex items-center justify-between mb-3">
+              <h4 class="text-sm font-medium text-white flex items-center gap-2">
+                <UIcon name="i-heroicons-cpu-chip" class="w-4 h-4 text-blue-400" />
+                机器人进程状态
+                <UBadge v-if="processCount !== undefined" :color="processCount > 0 ? 'green' : 'red'" variant="subtle" size="xs">
+                  {{ processCount }} 个进程
+                </UBadge>
+              </h4>
+              <UButton variant="ghost" size="xs" @click="refreshBotStatus">
+                <UIcon name="i-heroicons-arrow-path" class="w-3 h-3" />
+              </UButton>
+            </div>
+            
+            <div v-if="botProcesses.length > 0" class="space-y-3">
+              <div v-for="process in botProcesses" :key="process.pid" class="bg-[#1a1a1b] border border-[#2a2a2b] rounded-md p-3">
+                <div class="flex items-center justify-between mb-2">
+                  <div class="flex items-center space-x-2">
+                    <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                    <span class="text-sm font-medium text-white">{{ process.name }}</span>
+                  </div>
+                  <UBadge color="green" variant="subtle" size="xs">运行中</UBadge>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <span class="text-[#9ca3af]">进程ID:</span>
+                    <span class="text-white ml-1">{{ process.pid }}</span>
+                  </div>
+                  <div>
+                    <span class="text-[#9ca3af]">运行时间:</span>
+                    <span class="text-white ml-1">{{ process.uptime }}</span>
+                  </div>
+                  <div>
+                    <span class="text-[#9ca3af]">CPU:</span>
+                    <span class="text-white ml-1">{{ process.cpuUsage }}%</span>
+                  </div>
+                  <div>
+                    <span class="text-[#9ca3af]">内存:</span>
+                    <span class="text-white ml-1">{{ process.memUsage }}%</span>
+                  </div>
+                </div>
+                
+                <div class="mt-2 text-xs">
+                  <span class="text-[#9ca3af]">启动时间:</span>
+                  <span class="text-white ml-1">{{ formatDateTime(process.startedAt) }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div v-else class="text-center py-4">
+              <UIcon name="i-heroicons-exclamation-triangle" class="w-8 h-8 text-yellow-400 mx-auto mb-2" />
+              <p class="text-sm text-[#9ca3af]">未检测到机器人进程</p>
+            </div>
+          </div>
+          
+          <div class="flex items-center justify-between p-3 bg-[#0c0c0d] border border-[#2a2a2b] rounded-md">
+            <div class="flex items-center space-x-3">
+              <div class="relative">
+                <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                <div class="absolute inset-0 w-3 h-3 bg-green-400 rounded-full animate-ping opacity-75"></div>
+              </div>
+              <span class="text-white font-medium">已连接</span>
+            </div>
+            <span class="text-sm text-[#9ca3af]">最后更新: {{ telegramService.lastUpdate }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- API 服务状态 -->
+      <div class="bg-[#1a1a1b] border border-[#2a2a2b] rounded-lg">
+        <div class="px-4 py-3 border-b border-[#2a2a2b] flex items-center justify-between">
+          <h3 class="text-lg font-medium text-white flex items-center gap-2">
+            <UIcon name="i-heroicons-server" class="w-5 h-5 text-green-400" />
+            API 服务
+          </h3>
+          <UBadge :color="apiService.status === 'normal' ? 'green' : 'red'" variant="subtle">
+            {{ apiService.status === 'normal' ? '正常' : '异常' }}
+          </UBadge>
+        </div>
+        
+        <div class="p-4 space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div class="bg-[#0c0c0d] border border-[#2a2a2b] rounded-md p-3 text-center">
+              <p class="text-2xl font-bold text-white">{{ apiService.requestsCount }}</p>
+              <p class="text-xs text-[#9ca3af]">今日请求</p>
+            </div>
+            <div class="bg-[#0c0c0d] border border-[#2a2a2b] rounded-md p-3 text-center">
+              <p class="text-2xl font-bold text-white">{{ apiService.uptime }}%</p>
+              <p class="text-xs text-[#9ca3af]">可用性</p>
+            </div>
+          </div>
+          
+          <div class="flex items-center justify-between p-3 bg-[#0c0c0d] border border-[#2a2a2b] rounded-md">
+            <div class="flex items-center space-x-3">
+              <div class="relative">
+                <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+              </div>
+              <span class="text-white font-medium">服务正常</span>
+            </div>
+            <span class="text-sm text-[#9ca3af]">响应时间: {{ apiService.responseTime }}ms</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 数据库状态 -->
+    <div class="bg-[#1a1a1b] border border-[#2a2a2b] rounded-lg">
+      <div class="px-4 py-3 border-b border-[#2a2a2b] flex items-center justify-between">
+        <h3 class="text-lg font-medium text-white flex items-center gap-2">
+          <UIcon name="i-heroicons-circle-stack" class="w-5 h-5 text-blue-400" />
+          数据库状态
+        </h3>
+        <UBadge :color="database.status === 'connected' ? 'green' : 'red'" variant="subtle">
+          {{ database.status === 'connected' ? '已连接' : '连接失败' }}
+        </UBadge>
+      </div>
+      
+      <div class="p-4">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div class="bg-[#0c0c0d] border border-[#2a2a2b] rounded-md p-3 text-center">
+            <p class="text-lg font-bold text-white">{{ database.totalUsers }}</p>
+            <p class="text-xs text-[#9ca3af]">总用户数</p>
+          </div>
+          <div class="bg-[#0c0c0d] border border-[#2a2a2b] rounded-md p-3 text-center">
+            <p class="text-lg font-bold text-white">{{ database.totalMessages }}</p>
+            <p class="text-xs text-[#9ca3af]">总消息数</p>
+          </div>
+          <div class="bg-[#0c0c0d] border border-[#2a2a2b] rounded-md p-3 text-center">
+            <p class="text-lg font-bold text-white">{{ database.dbSize }}</p>
+            <p class="text-xs text-[#9ca3af]">数据库大小</p>
+          </div>
+          <div class="bg-[#0c0c0d] border border-[#2a2a2b] rounded-md p-3 text-center">
+            <p class="text-lg font-bold text-white">{{ database.connections }}</p>
+            <p class="text-xs text-[#9ca3af]">活跃连接</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 快速操作 -->
+    <div class="bg-[#1a1a1b] border border-[#2a2a2b] rounded-lg">
+      <div class="px-4 py-3 border-b border-[#2a2a2b]">
+        <h3 class="text-lg font-medium text-white">快速操作</h3>
+      </div>
+      
+      <div class="p-4">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div class="bg-[#0c0c0d] border border-[#2a2a2b] rounded-md p-4 hover:bg-[#2a2a2b]/50 transition-colors cursor-pointer">
+            <div class="text-center">
+              <div class="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center mx-auto mb-3">
+                <UIcon name="i-heroicons-arrow-path" class="w-6 h-6 text-blue-400" />
+              </div>
+              <h4 class="text-sm font-medium text-white mb-1">刷新状态</h4>
+              <p class="text-xs text-[#9ca3af]">更新所有服务状态</p>
+            </div>
+          </div>
+          
+          <div class="bg-[#0c0c0d] border border-[#2a2a2b] rounded-md p-4 hover:bg-[#2a2a2b]/50 transition-colors cursor-pointer">
+            <div class="text-center">
+              <div class="w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center mx-auto mb-3">
+                <UIcon name="i-heroicons-document-text" class="w-6 h-6 text-green-400" />
+              </div>
+              <h4 class="text-sm font-medium text-white mb-1">查看日志</h4>
+              <p class="text-xs text-[#9ca3af]">系统运行日志</p>
+            </div>
+          </div>
+          
+          <div class="bg-[#0c0c0d] border border-[#2a2a2b] rounded-md p-4 hover:bg-[#2a2a2b]/50 transition-colors cursor-pointer">
+            <div class="text-center">
+              <div class="w-12 h-12 bg-purple-500/10 rounded-lg flex items-center justify-center mx-auto mb-3">
+                <UIcon name="i-heroicons-cog-6-tooth" class="w-6 h-6 text-purple-400" />
+              </div>
+              <h4 class="text-sm font-medium text-white mb-1">系统设置</h4>
+              <p class="text-xs text-[#9ca3af]">配置系统参数</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 最近活动 -->
+    <div class="bg-[#1a1a1b] border border-[#2a2a2b] rounded-lg">
+      <div class="px-4 py-3 border-b border-[#2a2a2b]">
+        <h3 class="text-lg font-medium text-white">最近活动</h3>
+      </div>
+      
+      <div class="p-4">
+        <div class="space-y-3">
+          <div v-for="activity in recentActivities" :key="activity.id" class="flex items-center space-x-3 p-3 bg-[#0c0c0d] border border-[#2a2a2b] rounded-md">
+            <div class="w-8 h-8 bg-blue-500/10 rounded-lg flex items-center justify-center">
+              <UIcon :name="activity.icon" class="w-4 h-4 text-blue-400" />
+            </div>
+            <div class="flex-1">
+              <p class="text-sm text-white">{{ activity.message }}</p>
+              <p class="text-xs text-[#9ca3af]">{{ activity.time }}</p>
+            </div>
+            <UBadge :color="activity.type === 'success' ? 'green' : activity.type === 'warning' ? 'yellow' : 'red'" variant="subtle" size="sm">
+              {{ activity.status }}
+            </UBadge>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+// 页面元数据
+definePageMeta({
+  title: '能量出租管理系统',
+  description: '监控能量出租机器人状态和交易数据'
+})
+
+// 响应式数据
+const systemStatus = ref({
+  status: '正常运行',
+  activeUsers: 1247,
+  todayTransactions: 156,
+  totalEnergyRented: 125000000
+})
+
+const telegramService = ref({
+  status: 'online',
+  activeUsers: 1247,
+  energyTransactions: 156,
+  lastUpdate: '刚刚'
+})
+
+// 组件销毁时清理定时器
+onUnmounted(() => {
+  if (refreshTimer) {
+    clearInterval(refreshTimer)
+    refreshTimer = null
+  }
+})
+
+const apiService = ref({
+  status: 'normal',
+  requestsCount: 12847,
+  uptime: 99.9,
+  responseTime: 45
+})
+
+// 组件销毁时清理定时器
+onUnmounted(() => {
+  if (refreshTimer) {
+    clearInterval(refreshTimer)
+    refreshTimer = null
+  }
+})
+
+const database = ref({
+  status: 'connected',
+  totalUsers: 5432,
+  totalMessages: 98765,
+  dbSize: '2.3GB',
+  connections: 12
+})
+
+// 组件销毁时清理定时器
+onUnmounted(() => {
+  if (refreshTimer) {
+    clearInterval(refreshTimer)
+    refreshTimer = null
+  }
+})
+
+// 机器人进程状态
+const botProcesses = ref([])
+const processCount = ref(0)
+
+const recentActivities = ref([
+  {
+    id: 1,
+    icon: 'i-heroicons-bolt',
+    message: '用户完成能量出租交易',
+    time: '2分钟前',
+    type: 'success',
+    status: '成功'
+  },
+  {
+    id: 2,
+    icon: 'i-heroicons-user-plus',
+    message: '新用户开始使用能量出租服务',
+    time: '5分钟前',
+    type: 'success',
+    status: '成功'
+  },
+  {
+    id: 3,
+    icon: 'i-heroicons-currency-dollar',
+    message: '大额能量交易完成',
+    time: '10分钟前',
+    type: 'success',
+    status: '完成'
+  },
+  {
+    id: 4,
+    icon: 'i-heroicons-arrow-path',
+    message: '机器人自动处理能量分配',
+    time: '15分钟前',
+    type: 'info',
+    status: '处理中'
+  }
+])
+
+// 定时器引用
+let refreshTimer = null
+
+// 生命周期钩子
+onMounted(() => {
+  // 初始化数据
+  refreshData()
+  
+  // 设置定时刷新
+  refreshTimer = setInterval(refreshData, 30000) // 每30秒刷新一次
+})
+
+// 组件销毁时清理定时器
+onUnmounted(() => {
+  if (refreshTimer) {
+    clearInterval(refreshTimer)
+    refreshTimer = null
+  }
+})
+
+// 方法
+const refreshData = async () => {
+  try {
+    // 这里可以调用API获取实时数据
+    console.log('刷新仪表板数据')
+    await fetchBotStatus()
+  } catch (error) {
+    console.error('刷新数据失败:', error)
+  }
+}
+
+// 获取机器人状态
+const fetchBotStatus = async () => {
+  try {
+    const response = await $fetch('/api/bot-status')
+    if (response.success) {
+      botProcesses.value = response.data.processes
+      processCount.value = response.data.processCount || response.data.processes.length
+    }
+  } catch (error) {
+    console.error('获取机器人状态失败:', error)
+    botProcesses.value = []
+    processCount.value = 0
+  }
+}
+
+// 刷新机器人状态
+const refreshBotStatus = async () => {
+  await fetchBotStatus()
+}
+
+// 格式化日期时间
+const formatDateTime = (dateString) => {
+  const date = new Date(dateString)
+  return date.toLocaleString('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  })
+}
+
+// 格式化能量数值
+const formatEnergy = (energy) => {
+  if (energy >= 100000000) {
+    return (energy / 100000000).toFixed(1) + '亿'
+  } else if (energy >= 10000) {
+    return (energy / 10000).toFixed(1) + '万'
+  } else {
+    return energy.toString()
+  }
+}
+</script>

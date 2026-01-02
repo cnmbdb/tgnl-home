@@ -1,0 +1,26 @@
+[
+  {
+    "tg_user_id": 123456789,
+    "username": "testuser1",
+    "first_name": "Test",
+    "last_name": "User1",
+    "phone_number": "+1234567890",
+    "balance": 1000000
+  },
+  {
+    "tg_user_id": 987654321,
+    "username": "testuser2",
+    "first_name": "Test",
+    "last_name": "User2",
+    "phone_number": "+0987654321",
+    "balance": 2000000
+  },
+  {
+    "tg_user_id": 555666777,
+    "username": "testuser3",
+    "first_name": "Test",
+    "last_name": "User3",
+    "phone_number": "+5556667777",
+    "balance": 500000
+  }
+]

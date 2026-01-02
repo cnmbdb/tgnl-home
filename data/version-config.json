@@ -1,0 +1,18 @@
+{
+  "currentVersion": "1.0.4",
+  "latestVersion": "1.0.5",
+  "updateInfo": {
+    "version": "1.0.5",
+    "name": "Release 1.0.5",
+    "description": "修复GitHub API 403错误，优化版本检查功能",
+    "publishedAt": "2024-01-15T10:00:00Z",
+    "downloadUrl": "https://github.com/cnmbdb/hf-tgnl-admin/archive/refs/tags/v1.0.5.zip",
+    "tarballUrl": "https://github.com/cnmbdb/hf-tgnl-admin/archive/refs/tags/v1.0.5.tar.gz",
+    "size": 63100000,
+    "changelog": "- 修复GitHub API访问限制问题\n- 优化版本检查逻辑\n- 改进错误处理机制",
+    "author": "cnmbdb",
+    "htmlUrl": "https://github.com/cnmbdb/hf-tgnl-admin/releases",
+    "assets": []
+  },
+  "hasUpdate": true
+}

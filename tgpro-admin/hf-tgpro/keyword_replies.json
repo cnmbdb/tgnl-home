@@ -1,0 +1,272 @@
+{
+  "commands": {
+    "/start": [
+      {
+        "id": "start_text",
+        "type": "text",
+        "content": "🎉 您好，{username}！\n✨ 欢迎使用全新升级的Telegram会员充值机器人\n🆔 您的专属平台ID：{user_id}",
+        "order": 1
+      },
+      {
+        "id": "start_image_buttons",
+        "type": "image_text_buttons",
+        "image": "photo.jpg",
+        "content": "🤖 本机器人为您提供【24小时·Telegram会员】自助开通服务\n💎 享受高级功能，提升您的Telegram体验\n👇 请选择下方按钮开始：",
+        "buttons": [
+          [
+            {
+              "text": "🌟此账号开通",
+              "callback_data": "buy_myself"
+            },
+            {
+              "text": "🎁为他人开通",
+              "callback_data": "buy_ship"
+            }
+          ],
+          [
+            {
+              "text": "🔸会员价格🔸",
+              "callback_data": "buy_price"
+            }
+          ],
+          [
+            {
+              "text": "🔸批量开会员🔸",
+              "callback_data": "buy_ship"
+            }
+          ]
+        ],
+        "order": 2
+      }
+    ]
+  },
+  "buttons": {
+    "🌟购买会员": [
+      {
+        "id": "buy_member_image_buttons",
+        "type": "image_text_buttons",
+        "image": "photo.jpg",
+        "content": "🤖 本机器人为您提供【24小时·Telegram会员】自助开通服务\n💎 享受高级功能，提升您的Telegram体验\n👇 请选择下方按钮开始：",
+        "buttons": [
+          [
+            {
+              "text": "🌟此账号开通",
+              "callback_data": "buy_myself"
+            },
+            {
+              "text": "🎁为他人开通",
+              "callback_data": "buy_ship"
+            }
+          ],
+          [
+            {
+              "text": "🔸会员价格🔸",
+              "callback_data": "buy_price"
+            }
+          ],
+          [
+            {
+              "text": "🔸批量开会员🔸",
+              "callback_data": "buy_ship"
+            }
+          ]
+        ],
+        "order": 1
+      }
+    ],
+    "👩联系客服": [
+      {
+        "id": "contact_service_text_buttons",
+        "type": "text_buttons",
+        "content": "📞 *联系客服* - 测试同步更新\n\n如果您在使用过程中遇到任何问题，请通过以下方式联系我们的客服团队：\n\n🕐 客服时间：24小时在线\n⚡ 响应时间：通常在5分钟内回复\n🔄 配置已更新，测试实时同步功能",
+        "buttons": [
+          [
+            {
+              "text": "💬在线客服",
+              "url": "https://telegram.org"
+            },
+            {
+              "text": "📧邮件客服",
+              "url": "https://telegram.org/support"
+            }
+          ],
+          [
+            {
+              "text": "📱客服群组",
+              "url": "https://telegram.org/faq"
+            }
+          ],
+          [
+            {
+              "text": "🔙返回主菜单",
+              "callback_data": "back_to_main"
+            }
+          ]
+        ],
+        "order": 1
+      }
+    ],
+    "⚡️我要充值": [
+      {
+        "id": "recharge_text_buttons",
+        "type": "text_buttons",
+        "content": "💰 *选择充值金额*\n\n请在下方选择您要充值的金额：\n💳 支持USDT充值\n⚡ 到账时间：1-3分钟",
+        "buttons": [
+          [
+            {
+              "text": "20",
+              "callback_data": "recharge_20"
+            },
+            {
+              "text": "40",
+              "callback_data": "recharge_40"
+            },
+            {
+              "text": "60",
+              "callback_data": "recharge_60"
+            },
+            {
+              "text": "80",
+              "callback_data": "recharge_80"
+            },
+            {
+              "text": "100",
+              "callback_data": "recharge_100"
+            }
+          ],
+          [
+            {
+              "text": "33",
+              "callback_data": "recharge_33"
+            },
+            {
+              "text": "66",
+              "callback_data": "recharge_66"
+            },
+            {
+              "text": "99",
+              "callback_data": "recharge_99"
+            },
+            {
+              "text": "132",
+              "callback_data": "recharge_132"
+            },
+            {
+              "text": "165",
+              "callback_data": "recharge_165"
+            }
+          ],
+          [
+            {
+              "text": "49",
+              "callback_data": "recharge_49"
+            },
+            {
+              "text": "98",
+              "callback_data": "recharge_98"
+            },
+            {
+              "text": "147",
+              "callback_data": "recharge_147"
+            },
+            {
+              "text": "196",
+              "callback_data": "recharge_196"
+            },
+            {
+              "text": "245",
+              "callback_data": "recharge_245"
+            }
+          ],
+          [
+            {
+              "text": "🔙返回主菜单",
+              "callback_data": "back_to_main"
+            }
+          ]
+        ],
+        "order": 1
+      }
+    ],
+    "👤个人中心": [
+      {
+        "id": "user_center_text_buttons",
+        "type": "text_buttons",
+        "content": "👤 *个人中心*\n\n您的信息：\n🆔 平台ID：{user_id}\n💰 当前余额：{balance} USDT\n📅 创建时间：{create_time}\n\n💡 提示：余额可用于购买Telegram会员服务",
+        "buttons": [
+          [
+            {
+              "text": "💰充值余额",
+              "callback_data": "recharge"
+            },
+            {
+              "text": "📊消费记录",
+              "callback_data": "consumption_history"
+            }
+          ],
+          [
+            {
+              "text": "🎫我的订单",
+              "callback_data": "my_orders"
+            },
+            {
+              "text": "⚙️账户设置",
+              "callback_data": "account_settings"
+            }
+          ],
+          [
+            {
+              "text": "🔙返回主菜单",
+              "callback_data": "back_to_main"
+            }
+          ]
+        ],
+        "order": 1
+      }
+    ],
+    "buy_myself": [
+      {
+        "id": "buy_myself_text",
+        "type": "text",
+        "content": "🌟 *为此账号开通会员*\n\n请选择会员时长：",
+        "order": 1
+      }
+    ],
+    "buy_price": [
+      {
+        "id": "buy_price_text_buttons",
+        "type": "text_buttons",
+        "content": "💰 *会员价格表*\n\n🔸 1个月：$4.99\n🔸 3个月：$12.99\n🔸 6个月：$24.99\n🔸 12个月：$49.99\n\n请选择您需要的时长：",
+        "buttons": [
+          [
+            {
+              "text": "1个月 - $4.99",
+              "callback_data": "buy_1month"
+            },
+            {
+              "text": "3个月 - $12.99",
+              "callback_data": "buy_3month"
+            }
+          ],
+          [
+            {
+              "text": "6个月 - $24.99",
+              "callback_data": "buy_6month"
+            },
+            {
+              "text": "12个月 - $49.99",
+              "callback_data": "buy_12month"
+            }
+          ],
+          [
+            {
+              "text": "🔙返回",
+              "callback_data": "back"
+            }
+          ]
+        ],
+        "order": 1
+      }
+    ]
+  }
+}

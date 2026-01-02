@@ -1,0 +1,44 @@
+// https://nuxt.com/docs/api/configuration/nuxt-config
+export default defineNuxtConfig({
+  devtools: { enabled: true },
+  modules: [
+    '@nuxt/ui',
+    '@pinia/nuxt',
+    '@nuxtjs/tailwindcss',
+    '@nuxtjs/color-mode'
+  ],
+  css: ['~/assets/css/main.css'],
+  ui: {
+    global: true
+  },
+  colorMode: {
+    preference: 'dark',
+    fallback: 'dark',
+    hid: 'nuxt-color-mode-script',
+    globalName: '__NUXT_COLOR_MODE__',
+    componentName: 'ColorScheme',
+    classPrefix: '',
+    classSuffix: '',
+    storageKey: 'nuxt-color-mode'
+  },
+  typescript: {
+    strict: true
+  },
+  runtimeConfig: {
+    // Private keys (only available on server-side)
+    dbHost: process.env.DB_HOST || '50.114.206.171',
+    dbUser: process.env.DB_USER || 'hftgpro',
+    dbPassword: process.env.DB_PASSWORD || 'hftgpro',
+    dbName: process.env.DB_NAME || 'hftgpro',
+    dbPort: process.env.DB_PORT || 3306,
+    // Public keys (exposed to client-side)
+    public: {
+      apiBase: '/api'
+    }
+  },
+  nitro: {
+    experimental: {
+      wasm: true
+    }
+  }
+})

@@ -1,0 +1,32 @@
+[
+  {
+    "id": "update-001",
+    "version": "1.0.1",
+    "date": "2024-01-15T10:30:00Z",
+    "type": "patch",
+    "status": "completed",
+    "description": "修复了用户界面的一些小问题",
+    "changes": [
+      "修复了登录页面的样式问题",
+      "优化了数据加载性能",
+      "更新了依赖包版本"
+    ],
+    "downloadSize": "15.2 MB",
+    "installTime": "2分钟"
+  },
+  {
+    "id": "update-002", 
+    "version": "1.0.0",
+    "date": "2024-01-01T00:00:00Z",
+    "type": "major",
+    "status": "completed",
+    "description": "系统初始版本发布",
+    "changes": [
+      "完整的用户管理系统",
+      "机器人配置功能",
+      "数据统计分析"
+    ],
+    "downloadSize": "125.8 MB",
+    "installTime": "10分钟"
+  }
+]

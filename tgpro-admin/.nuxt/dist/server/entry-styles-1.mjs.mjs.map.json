@@ -1,0 +1,1 @@
+{"file":"entry-styles-1.mjs.mjs","mappings":"","names":[],"sources":["../../../node_modules/tailwindcss/tailwind.css?inline&used"],"sourcesContent":["@tailwind base;\n\n@tailwind components;\n\n@tailwind utilities;\n"],"version":3}

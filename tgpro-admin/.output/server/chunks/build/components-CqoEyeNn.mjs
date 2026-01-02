@@ -1,0 +1,213 @@
+import { T as useNuxtApp, u as useAppConfig, g as useAsyncData, E as useRuntimeConfig, b as useHead$1 } from './server.mjs';
+import { defineComponent, computed, h, onServerPrefetch } from 'vue';
+import { Icon, getIcon, loadIcon } from '@iconify/vue';
+import { getIconCSS } from '@iconify/utils/lib/css/icon';
+import '../nitro/nitro.mjs';
+import 'mysql2/promise';
+import 'node:http';
+import 'node:https';
+import 'node:events';
+import 'node:buffer';
+import 'node:fs';
+import 'node:path';
+import 'node:crypto';
+import 'node:url';
+import '@iconify/utils';
+import 'consola';
+import 'vue-router';
+import 'perfect-debounce';
+import '@vueuse/core';
+import 'tailwind-merge';
+import 'vue/server-renderer';
+import '../routes/renderer.mjs';
+import 'vue-bundle-renderer/runtime';
+import 'unhead/server';
+import 'devalue';
+import 'unhead/utils';
+import 'unhead/plugins';
+
+async function loadIcon$1(name, timeout) {
+  if (!name) return null;
+  const _icon = getIcon(name);
+  if (_icon) return _icon;
+  let timeoutWarn;
+  const load = loadIcon(name).catch(() => {
+    console.warn(`[Icon] failed to load icon \`${name}\``);
+    return null;
+  });
+  if (timeout > 0) await Promise.race([load, new Promise((resolve) => {
+    timeoutWarn = setTimeout(() => {
+      console.warn(`[Icon] loading icon \`${name}\` timed out after ${timeout}ms`);
+      resolve();
+    }, timeout);
+  })]).finally(() => clearTimeout(timeoutWarn));
+  else await load;
+  return getIcon(name);
+}
+function useResolvedName(getName) {
+  const options = useAppConfig().icon;
+  const collections = (options.collections || []).sort((a, b) => b.length - a.length);
+  return computed(() => {
+    var _a;
+    const name = getName();
+    const bare = name.startsWith(options.cssSelectorPrefix) ? name.slice(options.cssSelectorPrefix.length) : name;
+    const resolved = ((_a = options.aliases) == null ? void 0 : _a[bare]) || bare;
+    if (!resolved.includes(":")) {
+      const collection = collections.find((c) => resolved.startsWith(c + "-"));
+      return collection ? collection + ":" + resolved.slice(collection.length + 1) : resolved;
+    }
+    return resolved;
+  });
+}
+function resolveCustomizeFn(customize, globalCustomize) {
+  if (customize === false) return void 0;
+  if (customize === true || customize === null) return globalCustomize;
+  return customize;
+}
+var SYMBOL_SERVER_CSS = "NUXT_ICONS_SERVER_CSS";
+function escapeCssSelector(selector) {
+  return selector.replace(/([^\w-])/g, "\\$1");
+}
+const NuxtIconCss = /* @__PURE__ */ defineComponent({
+  name: "NuxtIconCss",
+  props: {
+    name: {
+      type: String,
+      required: true
+    },
+    customize: {
+      type: [
+        Function,
+        Boolean,
+        null
+      ],
+      default: null,
+      required: false
+    }
+  },
+  setup(props) {
+    const nuxt = useNuxtApp();
+    const options = useAppConfig().icon;
+    const cssClass = computed(() => props.name ? options.cssSelectorPrefix + props.name : "");
+    const selector = computed(() => "." + escapeCssSelector(cssClass.value));
+    function getCSS(icon, withLayer = true) {
+      let iconSelector = selector.value;
+      if (options.cssWherePseudo) iconSelector = `:where(${iconSelector})`;
+      const css = getIconCSS(icon, {
+        iconSelector,
+        format: "compressed",
+        customise: resolveCustomizeFn(props.customize, options.customize)
+      });
+      if (options.cssLayer && withLayer) return `@layer ${options.cssLayer} { ${css} }`;
+      return css;
+    }
+    onServerPrefetch(async () => {
+      var _a, _b;
+      if (!((_b = (_a = (/* @__PURE__ */ useRuntimeConfig()).icon || {}) == null ? void 0 : _a.serverKnownCssClasses) == null ? void 0 : _b.includes(cssClass.value))) {
+        const icon = await loadIcon$1(props.name, options.fetchTimeout).catch(() => null);
+        if (!icon) return null;
+        let ssrCSS = nuxt.vueApp._context.provides[SYMBOL_SERVER_CSS];
+        if (!ssrCSS) {
+          ssrCSS = nuxt.vueApp._context.provides[SYMBOL_SERVER_CSS] = /* @__PURE__ */ new Map();
+          nuxt.runWithContext(() => {
+            useHead$1({ style: [() => {
+              const sep = "";
+              let css = Array.from(ssrCSS.values()).sort().join(sep);
+              if (options.cssLayer) css = `@layer ${options.cssLayer} {${sep}${css}${sep}}`;
+              return { innerHTML: css };
+            }] }, { tagPriority: "low" });
+          });
+        }
+        if (props.name && !ssrCSS.has(props.name)) {
+          const css = getCSS(icon, false);
+          ssrCSS.set(props.name, css);
+        }
+        return null;
+      }
+    });
+    return () => h("span", { class: ["iconify", cssClass.value] });
+  }
+});
+const NuxtIconSvg = /* @__PURE__ */ defineComponent({
+  name: "NuxtIconSvg",
+  props: {
+    name: {
+      type: String,
+      required: true
+    },
+    customize: {
+      type: [
+        Function,
+        Boolean,
+        null
+      ],
+      default: null,
+      required: false
+    }
+  },
+  setup(props, { slots }) {
+    useNuxtApp();
+    const options = useAppConfig().icon;
+    const name = useResolvedName(() => props.name);
+    const storeKey = "i-" + name.value;
+    if (name.value) onServerPrefetch(async () => {
+      await useAsyncData(storeKey, async () => await loadIcon$1(name.value, options.fetchTimeout), { deep: false });
+    });
+    return () => h(Icon, {
+      icon: name.value,
+      ssr: true,
+      customise: resolveCustomizeFn(props.customize, options.customize)
+    }, slots);
+  }
+});
+var components_default = defineComponent({
+  name: "NuxtIcon",
+  props: {
+    name: {
+      type: String,
+      required: true
+    },
+    mode: {
+      type: String,
+      required: false,
+      default: null
+    },
+    size: {
+      type: [Number, String],
+      required: false,
+      default: null
+    },
+    customize: {
+      type: [
+        Function,
+        Boolean,
+        null
+      ],
+      default: null,
+      required: false
+    }
+  },
+  setup(props, { slots }) {
+    const nuxtApp = useNuxtApp();
+    const runtimeOptions = useAppConfig().icon;
+    const name = useResolvedName(() => props.name);
+    const component = computed(() => {
+      var _a;
+      return ((_a = nuxtApp.vueApp) == null ? void 0 : _a.component(name.value)) || ((props.mode || runtimeOptions.mode) === "svg" ? NuxtIconSvg : NuxtIconCss);
+    });
+    const style = computed(() => {
+      const size = props.size || runtimeOptions.size;
+      return size ? { fontSize: Number.isNaN(+size) ? size : size + "px" } : null;
+    });
+    return () => h(component.value, {
+      ...runtimeOptions.attrs,
+      name: name.value,
+      class: runtimeOptions.class,
+      style: style.value,
+      customize: props.customize
+    }, slots);
+  }
+});
+
+export { components_default as default };
+//# sourceMappingURL=components-CqoEyeNn.mjs.map
