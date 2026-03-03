@@ -1,0 +1,101 @@
+services:
+  web:
+    image: hfdoker2333/tgnl-home:web
+    pull_policy: always
+    restart: unless-stopped
+    ports:
+      - "3456:3000"
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=tgnl-postgres
+      - DB_PORT=5432
+      - DB_NAME=tgnl_db
+      - DB_USER=tgnl_user
+      - DB_PASSWORD=tgnl_password
+      - REDIS_HOST=tgnl-redis
+      - REDIS_PORT=6379
+      # 容器内应使用容器名称，而不是 localhost
+      - ENERGY_POOL_API_URL=http://tgnl-home-web:3000
+      - BOT_NOTIFY_URL=http://tgnl-admin-bot:8080/api/recharge-notify
+    env_file:
+      - .env.local
+    networks:
+      - tgnl-home_default
+    depends_on:
+      - tgnl-postgres
+      - tgnl-redis
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # 本地开发模式：代码挂载到容器内，热更新，无需重构镜像
+  web-dev:
+    image: node:20-alpine
+    container_name: web
+    working_dir: /app
+    restart: unless-stopped
+    command: sh -c "npm install && npm run dev -- -H 0.0.0.0 -p 3000"
+    ports:
+      - "3456:3000"
+    volumes:
+      - ./:/app
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=tgnl-postgres
+      - DB_PORT=5432
+      - DB_NAME=tgnl_db
+      - DB_USER=tgnl_user
+      - DB_PASSWORD=tgnl_password
+      - REDIS_HOST=tgnl-redis
+      - REDIS_PORT=6379
+      - ENERGY_POOL_API_URL=http://tgnl-home-web-dev:3000
+      - BOT_NOTIFY_URL=http://tgnl-admin-bot:8080/api/recharge-notify
+    env_file:
+      - .env.local
+    networks:
+      - tgnl-home_default
+    depends_on:
+      - tgnl-postgres
+      - tgnl-redis
+
+  tgnl-postgres:
+    image: postgres:15-alpine
+    pull_policy: always
+    container_name: tgnl-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=tgnl_db
+      - POSTGRES_USER=tgnl_user
+      - POSTGRES_PASSWORD=tgnl_password
+      - TZ=Asia/Shanghai
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./docker/init-full.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    networks:
+      - tgnl-home_default
+
+  tgnl-redis:
+    image: redis:7-alpine
+    pull_policy: always
+    container_name: tgnl-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - tgnl-home_default
+
+networks:
+  tgnl-home_default:
+    external: true
+
+volumes:
+  pg_data:
+  redis_data:
