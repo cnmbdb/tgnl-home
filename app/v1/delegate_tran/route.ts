@@ -67,8 +67,24 @@ export async function POST(request: Request) {
       const pricing = pricingResult.rows[0]
       const dayValue = day || 0
       let costTrx = 0
+
       if (dayValue === 0) {
-        costTrx = parseFloat(pricing.cost_bishu_trx) || 0
+        // day === 0 表示按「1小时」计费（1小时1/2/5/10次）
+        // 注意：原来的「笔数预存」功能已从机器人侧删除，现在 day=0 就是1小时套餐
+        // 机器人侧约定：1 笔能量 = 65000，N 笔能量 = 65000 * N
+        const baseEnergyPerOrder = 65000
+        let multiplier = 1
+        if (typeof energy === 'number' && energy > 0) {
+          const approx = energy / baseEnergyPerOrder
+          // 四舍五入并至少为 1，避免浮点误差导致 0
+          multiplier = Math.max(1, Math.round(approx))
+        }
+        // 使用 1小时套餐成本（而不是笔数预存成本）
+        const baseCostTrx = parseFloat(pricing.cost_1hour_trx) || 0
+        costTrx = baseCostTrx * multiplier
+        console.log(
+          `[delegate_tran] 计算1小时套餐成本: baseCost=${baseCostTrx} TRX, multiplier=${multiplier}, totalCost=${costTrx} TRX, energy=${energy}`
+        )
       } else if (dayValue === 1) {
         costTrx = parseFloat(pricing.cost_1day_trx) || 0
       } else if (dayValue === 3) {

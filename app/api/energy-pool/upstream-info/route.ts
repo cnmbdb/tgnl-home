@@ -133,10 +133,12 @@ export async function POST(request: Request) {
     const lastConsumptionTimeStr = json['最后消费时间'] as string | null
 
     // 计算成本价格
+    // 1小时、1天：直接用公式
     const cost1HourTrx = price1HourSun ? calculateCostTrx(price1HourSun) : null
     const cost1DayTrx = price1DaySun ? calculateCostTrx(price1DaySun) : null
-    const cost3DayTrx = price3DaySun ? calculateCostTrx(price3DaySun) : null
-    const cost30DayTrx = price30DaySun ? calculateCostTrx(price30DaySun) : null
+    // 3天、30天：在原公式基础上乘以天数
+    const cost3DayTrx = price3DaySun ? calculateCostTrx(price3DaySun) * 3 : null
+    const cost30DayTrx = price30DaySun ? calculateCostTrx(price30DaySun) * 30 : null
 
     // 解析最后消费时间
     let lastConsumptionTime: Date | null = null

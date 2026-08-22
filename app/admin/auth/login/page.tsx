@@ -145,130 +145,381 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-8 bg-black">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-2 text-white">
-            Telegram 能量池
-          </h1>
-          <p className="text-gray-400 text-sm">后台管理系统</p>
-        </div>
-
-        {/* 访问方式选择器 */}
-        {showAccessSelector && accessConfig && (
-          <div className="mb-6 rounded-lg border border-gray-700 bg-gray-900/80 p-4">
-            <div className="text-sm text-gray-300 mb-3">选择访问方式：</div>
-            <div className="flex flex-col sm:flex-row gap-2">
-              {accessConfig.domainUrl && !accessConfig.domainUrl.includes('[IP地址]') && (
-                <button
-                  onClick={() => switchAccess(accessConfig.domainUrl)}
-                  className="flex-1 px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-600 rounded-lg text-white text-sm transition-colors min-h-[44px]"
-                >
-                  🌐 域名访问
-                </button>
-              )}
-              {accessConfig.ipUrl && !accessConfig.ipUrl.includes('[IP地址]') && (
-                <button
-                  onClick={() => switchAccess(accessConfig.ipUrl)}
-                  className="flex-1 px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-600 rounded-lg text-white text-sm transition-colors min-h-[44px]"
-                >
-                  🔌 IP 访问
-                </button>
-              )}
-            </div>
-            <div className="mt-2 text-xs text-gray-500 space-y-1">
-              {accessConfig.domainUrl && !accessConfig.domainUrl.includes('[IP地址]') && (
-                <div>域名：<code className="text-xs">{accessConfig.domainUrl}</code></div>
-              )}
-              {accessConfig.ipUrl && !accessConfig.ipUrl.includes('[IP地址]') && (
-                <div>IP：<code className="text-xs">{accessConfig.ipUrl}</code></div>
-              )}
-            </div>
+    <>
+      <main className="login-page">
+        <div className="login-container">
+          <div className="login-header">
+            <h1 className="login-title">Telegram 能量池</h1>
+            <p className="login-subtitle">后台管理系统 · 版本标记 v20260306-02</p>
           </div>
-        )}
 
-        <div className="rounded-lg border border-gray-800 bg-gray-900/50 p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-2">
-                账号
-              </label>
-              <input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="w-full px-4 py-3 bg-black border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-white transition-all"
-                placeholder="请输入账号"
-                required
-                autoFocus
-              />
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
-                密码
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-black border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-white transition-all"
-                placeholder="请输入密码"
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="captcha" className="block text-sm font-medium text-gray-300 mb-2">
-                验证码
-              </label>
-              <div className="flex items-center gap-3">
-                <div className="flex-1 flex items-center gap-2 px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg">
-                  <span className="text-white font-mono text-lg">
-                    {captcha ? captcha.question : '加载中...'}
-                  </span>
+          {/* 访问方式选择器 */}
+          {showAccessSelector && accessConfig && (
+            <div className="access-box">
+              <div className="access-title">选择访问方式：</div>
+              <div className="access-actions">
+                {accessConfig.domainUrl && !accessConfig.domainUrl.includes('[IP地址]') && (
                   <button
                     type="button"
-                    onClick={loadCaptcha}
-                    className="ml-auto text-gray-400 hover:text-white transition-colors text-sm"
-                    title="刷新验证码"
+                    onClick={() => switchAccess(accessConfig.domainUrl)}
+                    className="access-btn"
                   >
-                    🔄
+                    🌐 域名访问
                   </button>
-                </div>
+                )}
+                {accessConfig.ipUrl && !accessConfig.ipUrl.includes('[IP地址]') && (
+                  <button
+                    type="button"
+                    onClick={() => switchAccess(accessConfig.ipUrl)}
+                    className="access-btn"
+                  >
+                    🔌 IP 访问
+                  </button>
+                )}
+              </div>
+              <div className="access-hint">
+                {accessConfig.domainUrl && !accessConfig.domainUrl.includes('[IP地址]') && (
+                  <div>域名：<code>{accessConfig.domainUrl}</code></div>
+                )}
+                {accessConfig.ipUrl && !accessConfig.ipUrl.includes('[IP地址]') && (
+                  <div>IP：<code>{accessConfig.ipUrl}</code></div>
+                )}
+              </div>
+            </div>
+          )}
+
+          <div className="login-card">
+            <form onSubmit={handleSubmit} className="login-form">
+              <div className="form-item">
+                <label htmlFor="username" className="form-label">
+                  账号
+                </label>
                 <input
-                  id="captcha"
+                  id="username"
                   type="text"
-                  value={captchaAnswer}
-                  onChange={(e) => setCaptchaAnswer(e.target.value.replace(/\D/g, ''))}
-                  className="w-24 px-4 py-3 bg-black border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-white transition-all text-center"
-                  placeholder="答案"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="form-input"
+                  placeholder="请输入账号"
                   required
-                  maxLength={3}
-                  inputMode="numeric"
+                  autoFocus
                 />
               </div>
-              <p className="mt-1 text-xs text-gray-500">请输入计算结果</p>
-            </div>
 
-            {error && (
-              <div className="px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
-                {error}
+              <div className="form-item">
+                <label htmlFor="password" className="form-label">
+                  密码
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="form-input"
+                  placeholder="请输入密码"
+                  required
+                />
               </div>
-            )}
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full px-4 py-3 bg-white text-black rounded-lg font-medium hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-700 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? '登录中...' : '登录'}
-            </button>
-          </form>
+              <div className="form-item">
+                <label htmlFor="captcha" className="form-label">
+                  验证码
+                </label>
+                <div className="captcha-row">
+                  <div className="captcha-box">
+                    <span className="captcha-text">
+                      {captcha ? captcha.question : '加载中...'}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={loadCaptcha}
+                      className="captcha-refresh"
+                      title="刷新验证码"
+                    >
+                      🔄
+                    </button>
+                  </div>
+                  <input
+                    id="captcha"
+                    type="text"
+                    value={captchaAnswer}
+                    onChange={(e) => setCaptchaAnswer(e.target.value.replace(/\D/g, ''))}
+                    className="captcha-input"
+                    placeholder="答案"
+                    required
+                    maxLength={3}
+                    inputMode="numeric"
+                  />
+                </div>
+                <p className="captcha-tip">请输入计算结果</p>
+              </div>
+
+              {error && (
+                <div className="error-box">
+                  {error}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="submit-btn"
+              >
+                {loading ? '登录中...' : '登录'}
+              </button>
+            </form>
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+
+      {/* 这里使用组件内样式，不依赖外部 CSS 文件，避免反代问题导致页面变形 */}
+      <style jsx>{`
+        .login-page {
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 32px 16px;
+          background-color: #000000;
+          color: #ffffff;
+        }
+
+        .login-container {
+          width: 100%;
+          max-width: 720px;
+        }
+
+        .login-header {
+          text-align: center;
+          margin-bottom: 32px;
+        }
+
+        .login-title {
+          font-size: 40px;
+          font-weight: 700;
+          margin: 0 0 8px;
+        }
+
+        .login-subtitle {
+          margin: 0;
+          font-size: 14px;
+          color: #9ca3af;
+        }
+
+        .access-box {
+          margin-bottom: 24px;
+          border-radius: 12px;
+          border: 1px solid #374151;
+          background: rgba(17, 24, 39, 0.85);
+          padding: 16px;
+        }
+
+        .access-title {
+          font-size: 14px;
+          color: #e5e7eb;
+          margin-bottom: 8px;
+        }
+
+        .access-actions {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        @media (min-width: 640px) {
+          .access-actions {
+            flex-direction: row;
+          }
+        }
+
+        .access-btn {
+          flex: 1;
+          min-height: 44px;
+          padding: 8px 16px;
+          border-radius: 10px;
+          border: 1px solid #4b5563;
+          background-color: #111827;
+          color: #ffffff;
+          font-size: 14px;
+          cursor: pointer;
+          transition: background-color 0.15s ease, border-color 0.15s ease;
+        }
+
+        .access-btn:hover {
+          background-color: #1f2937;
+          border-color: #6b7280;
+        }
+
+        .access-hint {
+          margin-top: 6px;
+          font-size: 12px;
+          color: #9ca3af;
+        }
+
+        .access-hint code {
+          font-size: 12px;
+        }
+
+        .login-card {
+          border-radius: 16px;
+          border: 1px solid #1f2937;
+          background: rgba(17, 24, 39, 0.85);
+          padding: 32px 28px;
+          box-shadow: 0 24px 80px rgba(0, 0, 0, 0.8);
+        }
+
+        .login-form {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+        }
+
+        .form-item {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+
+        .form-label {
+          font-size: 14px;
+          font-weight: 500;
+          color: #d1d5db;
+        }
+
+        .form-input {
+          width: 100%;
+          padding: 12px 16px;
+          border-radius: 10px;
+          border: 1px solid #4b5563;
+          background-color: #020617;
+          color: #ffffff;
+          font-size: 14px;
+          outline: none;
+          transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+        }
+
+        .form-input::placeholder {
+          color: #6b7280;
+        }
+
+        .form-input:focus {
+          border-color: #e5e7eb;
+          box-shadow: 0 0 0 1px #111827;
+        }
+
+        .captcha-row {
+          display: flex;
+          align-items: stretch;
+          gap: 12px;
+        }
+
+        .captcha-box {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 12px 16px;
+          border-radius: 10px;
+          border: 1px solid #4b5563;
+          background-color: #111827;
+        }
+
+        .captcha-text {
+          color: #ffffff;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+          font-size: 18px;
+        }
+
+        .captcha-refresh {
+          margin-left: auto;
+          background: none;
+          border: none;
+          color: #9ca3af;
+          cursor: pointer;
+          font-size: 14px;
+          padding: 0;
+          transition: color 0.15s ease;
+        }
+
+        .captcha-refresh:hover {
+          color: #ffffff;
+        }
+
+        .captcha-input {
+          width: 96px;
+          padding: 12px 10px;
+          border-radius: 10px;
+          border: 1px solid #4b5563;
+          background-color: #020617;
+          color: #ffffff;
+          font-size: 14px;
+          text-align: center;
+          outline: none;
+          transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+        }
+
+        .captcha-input::placeholder {
+          color: #6b7280;
+        }
+
+        .captcha-input:focus {
+          border-color: #e5e7eb;
+          box-shadow: 0 0 0 1px #111827;
+        }
+
+        .captcha-tip {
+          margin-top: 6px;
+          font-size: 12px;
+          color: #9ca3af;
+        }
+
+        .error-box {
+          padding: 12px 14px;
+          border-radius: 10px;
+          border: 1px solid rgba(248, 113, 113, 0.3);
+          background-color: rgba(248, 113, 113, 0.1);
+          color: #fecaca;
+          font-size: 13px;
+        }
+
+        .submit-btn {
+          width: 100%;
+          padding: 12px 16px;
+          border-radius: 10px;
+          border: none;
+          background-color: #f9fafb;
+          color: #000000;
+          font-size: 15px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+          background-color: #e5e7eb;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .submit-btn:active:not(:disabled) {
+          transform: translateY(1px);
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+        }
+
+        .submit-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        @media (max-width: 640px) {
+          .login-card {
+            padding: 24px 18px;
+          }
+
+          .login-title {
+            font-size: 32px;
+          }
+        }
+      `}</style>
+    </>
   )
 }

@@ -451,9 +451,6 @@ EP001	2.1500	6.7000	5.4000	5.4000	2.6700	2026-01-07 18:44:47.947035	2026-02-07 0
 --
 
 COPY public.energy_pools (id, name, status, usage, total, created_at, updated_at, provider_type, provider_base_url, provider_username, provider_password) FROM stdin;
-EP002	能量池 #2	active	420	1000	2026-01-02 18:13:57.66619+00	2026-01-02 18:13:57.66619+00	zhangpu	https://zhangpu.online	\N	\N
-EP003	能量池 #3	inactive	0	1000	2026-01-02 18:13:57.66619+00	2026-01-02 18:13:57.66619+00	zhangpu	https://zhangpu.online	\N	\N
-EP004	能量池 #4	active	880	1000	2026-01-02 18:13:57.66619+00	2026-01-02 18:13:57.66619+00	zhangpu	https://zhangpu.online	\N	\N
 EP001	能量池 #1	active	650	1000	2026-01-02 18:13:57.66619+00	2026-02-06 21:12:02.95876+00	zhangpu	https://zhangpu.online	hf2333	hfgsjbsja
 \.
 

@@ -113,14 +113,18 @@ export async function POST(request: Request) {
       console.log(`[delegate_meal] 准备委托能量: API用户=${apiUsername}, 能量=${energy}, 天数=${day}, 接收地址=${receiver_address}`)
       console.log(`[delegate_meal] 上游地址: ${upstreamUrl.toString()}`)
       console.log(`[delegate_meal] 上游账号: username=${provider.username}`)
-      
+
       const fetchController = new AbortController()
       const timeoutId = setTimeout(() => fetchController.abort(), 30000) // 30秒超时
-      
+
       let res: Response
       try {
         console.log(`[delegate_meal] 发送请求到上游: ${upstreamUrl.toString()}`)
         console.log(`[delegate_meal] 请求参数: energy=${energy}, day=${day}, receiver_address=${receiver_address}`)
+
+        // 将 day=0 映射为 day=1 传给上游（上游不支持 day=0）
+        const upstreamDay = day === 0 ? 1 : day
+        console.log(`[delegate_meal] 请求参数: energy=${energy}, day=${day} -> upstreamDay=${upstreamDay}, receiver_address=${receiver_address}`)
         
         res = await fetch(upstreamUrl.toString(), {
           method: 'POST',
@@ -132,7 +136,7 @@ export async function POST(request: Request) {
             username: provider.username,
             password: provider.password,
             energy,
-            day,
+            day: upstreamDay,
             receiver_address,
           }),
           signal: fetchController.signal,

@@ -11,15 +11,24 @@ export async function GET(request: NextRequest) {
     const requireDomain = process.env.REQUIRE_DOMAIN_FOR_LOGIN === 'true'
     const allowedDomains = process.env.ALLOWED_DOMAINS?.split(',').map(d => d.trim()).filter(Boolean) || []
     const loginPath = process.env.LOGIN_PATH || process.env.NEXT_PUBLIC_LOGIN_PATH || '/admin/auth/login'
-    const port = process.env.PORT || '3000'
+    const defaultPort = process.env.PORT || '3000'
     
     // 从请求头获取当前访问信息（更安全）
-    const host = request.headers.get('host') || `localhost:${port}`
-    const protocol = request.headers.get('x-forwarded-proto') || 
-                     (request.headers.get('x-forwarded-ssl') === 'on' ? 'https' : 'http') ||
-                     (port === '443' ? 'https' : 'http')
+    const host = request.headers.get('host') || `localhost:${defaultPort}`
+    const forwardedProto = request.headers.get('x-forwarded-proto')
+    const forwardedSsl = request.headers.get('x-forwarded-ssl')
+
+    // 优先使用代理传递的协议，否则根据端口推断
+    const protocol =
+      forwardedProto ||
+      (forwardedSsl === 'on' ? 'https' : undefined) ||
+      (defaultPort === '443' ? 'https' : 'http')
+
     const hostname = host.split(':')[0]
-    const currentPort = host.split(':')[1] || port
+    // Host 头里不带端口时，根据实际协议推断 80/443，避免对外展示 3000 这样的内部端口
+    const currentPort =
+      host.split(':')[1] ||
+      (protocol === 'https' ? '443' : '80')
     
     // 构建访问 URL（基于当前请求）
     let domainUrl = ''

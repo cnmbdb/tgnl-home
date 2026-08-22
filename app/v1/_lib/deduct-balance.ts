@@ -46,8 +46,21 @@ export async function deductApiUserBalance({
     // 根据 day 参数确定扣费金额
     let costTrx = 0
     if (day === 0) {
-      // 按笔数（闪兑/快速模式）
-      costTrx = parseFloat(pricing.cost_bishu_trx) || 0
+      // 按1小时套餐计费，支持1小时多笔（2/5/10 等）
+      // 注意：原来的「笔数预存」功能已从机器人侧删除，day=0 现在就是1小时套餐
+      // 机器人侧约定：1 笔能量 = 65000，N 笔能量 = 65000 * N
+      const baseEnergyPerOrder = 65000
+      let multiplier = 1
+      if (typeof energy === 'number' && energy > 0) {
+        const approx = energy / baseEnergyPerOrder
+        multiplier = Math.max(1, Math.round(approx))
+      }
+      // 使用 1小时套餐成本（而不是笔数预存成本）
+      const baseCostTrx = parseFloat(pricing.cost_1hour_trx) || 0
+      costTrx = baseCostTrx * multiplier
+      console.log(
+        `[deduct] 计算1小时套餐成本: baseCost=${baseCostTrx} TRX, multiplier=${multiplier}, totalCost=${costTrx} TRX, energy=${energy}`
+      )
     } else if (day === 1) {
       // 1天
       costTrx = parseFloat(pricing.cost_1day_trx) || 0
@@ -305,7 +318,8 @@ export async function recordFailedConsumptionOrder({
         const pricing = pricingResult.rows[0]
         const dayValue = day || 0
         if (dayValue === 0) {
-          costTrx = parseFloat(pricing.cost_bishu_trx) || 0
+          // 使用 1小时套餐成本（而不是笔数预存成本）
+          costTrx = parseFloat(pricing.cost_1hour_trx) || 0
         } else if (dayValue === 1) {
           costTrx = parseFloat(pricing.cost_1day_trx) || 0
         } else if (dayValue === 3) {

@@ -3,11 +3,12 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { DashboardIcon, EnergyIcon, BotIcon, AnalyticsIcon, SettingsIcon, UserIcon } from '@/components/ui/Icons'
+import { DashboardIcon, EnergyIcon, BotIcon, AnalyticsIcon, SettingsIcon, UserIcon, KeyIcon } from '@/components/ui/Icons'
 
 const navigation = [
   { name: '仪表板', href: '/dashboard', icon: DashboardIcon },
   { name: '能量池管理', href: '/dashboard/energy-pool', icon: EnergyIcon },
+  { name: '会员TON-API', href: '/dashboard/ton-api', icon: KeyIcon },
   { name: '机器人管理', href: '/dashboard/bots', icon: BotIcon },
   { name: 'API用户管理', href: '/dashboard/api-users', icon: UserIcon },
   { name: '数据分析', href: '/dashboard/analytics', icon: AnalyticsIcon },
