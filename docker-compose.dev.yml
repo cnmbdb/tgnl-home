@@ -1,0 +1,88 @@
+services:
+  web-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    image: tgnl-home:dev
+    container_name: tgnl-home-web-dev
+    init: true
+    restart: unless-stopped
+    command: npm run dev:docker
+    ports:
+      - "${DEV_WEB_PORT:-3001}:3000"
+    env_file:
+      - .env.local
+    environment:
+      NODE_ENV: development
+      NEXT_TELEMETRY_DISABLED: "1"
+      WATCHPACK_POLLING: "true"
+      CHOKIDAR_USEPOLLING: "true"
+      REQUIRE_DOMAIN_FOR_LOGIN: "false"
+      DB_HOST: postgres-dev
+      DB_PORT: "5432"
+      DB_NAME: tgnl_db
+      DB_USER: tgnl_user
+      DB_PASSWORD: tgnl_password
+      REDIS_HOST: redis-dev
+      REDIS_PORT: "6379"
+      ENERGY_POOL_API_URL: http://web-dev:3000
+    volumes:
+      - ./:/app
+      - web_dev_node_modules:/app/node_modules
+      - web_dev_next:/app/.next
+    depends_on:
+      postgres-dev:
+        condition: service_healthy
+      redis-dev:
+        condition: service_healthy
+    networks:
+      - dev
+
+  postgres-dev:
+    image: postgres:15-alpine
+    container_name: tgnl-postgres-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: tgnl_db
+      POSTGRES_USER: tgnl_user
+      POSTGRES_PASSWORD: tgnl_password
+      TZ: Asia/Shanghai
+    ports:
+      - "5433:5432"
+    volumes:
+      - pg_dev_data:/var/lib/postgresql/data
+      - ./docker/init-full.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tgnl_user -d tgnl_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - dev
+
+  redis-dev:
+    image: redis:7-alpine
+    container_name: tgnl-redis-dev
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_dev_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - dev
+
+networks:
+  dev:
+    name: tgnl-home-dev
+
+volumes:
+  web_dev_node_modules:
+  web_dev_next:
+  pg_dev_data:
+  redis_dev_data:
